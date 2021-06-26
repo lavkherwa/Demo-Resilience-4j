@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 
 @Component
 public class OutboundService {
@@ -27,9 +28,13 @@ public class OutboundService {
 
 	}
 
-	@CircuitBreaker(name = OUTBOUND_SERVICE, fallbackMethod = "outboundServiceFallback")
+	
+	@Retry(name = OUTBOUND_SERVICE, fallbackMethod = "outboundServiceFallback")
+	@CircuitBreaker(name = OUTBOUND_SERVICE)
 	public String callService(String url, String endpoint) {
 
+		System.out.println("attempting to call external service");
+		
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)//
 				.path(endpoint);
 

@@ -3,16 +3,10 @@ server:  port: 9000
 resilience4j:
   circuitbreaker:
     instances:
-      outbound-service:
-        registerHealthIndicator: true
-        eventConsumerBufferSize: 10
-        automaticTransitionFromOpenToHalfOpenEnabled: true
-        failureRateThreshold: 50
-        minimumNumberOfCalls: 5
-        permittedNumberOfCallsInHalfOpenState: 3
-        slidingWindowSize: 10
-        waitDurationInOpenState: 5s
-        slidingWindowType: COUNT_BASED
+      outbound-service:        minimumNumberOfCalls: 10
+        failureRateThreshold: 50        waitDurationInOpenState: 5s                automaticTransitionFromOpenToHalfOpenEnabled: true                permittedNumberOfCallsInHalfOpenState: 1                registerHealthIndicator: true
+        slidingWindowSize: 5
+        slidingWindowType: COUNT_BASED  retry:    instances:      outbound-service:        max-attempts: 3        wait-duration: 20                       
 
 management:
   health:
