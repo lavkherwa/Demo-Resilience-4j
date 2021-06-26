@@ -9,7 +9,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -46,7 +45,7 @@ public class OutboundService {
 		/* Try to perform the HTTP request call */
 		try {
 			response = restTemplate.exchange(requestEntity, String.class);
-		} catch (HttpClientErrorException | HttpServerErrorException exp) {
+		} catch (HttpClientErrorException exp) {
 			// @formatter:off
 			final String exception = String.format(
 					"ERROR: Call failed; with status code %d; Error `%s` on application URL `%s`; Status Code Text `%s`; Response Body `%s`",
