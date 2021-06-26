@@ -6,8 +6,7 @@ resilience4j:
       outbound-service:        minimumNumberOfCalls: 10
         failureRateThreshold: 50        waitDurationInOpenState: 5s                automaticTransitionFromOpenToHalfOpenEnabled: true                permittedNumberOfCallsInHalfOpenState: 1                registerHealthIndicator: true
         slidingWindowSize: 5
-        slidingWindowType: COUNT_BASED  retry:    instances:      outbound-service:        max-attempts: 3        wait-duration: 20                       
-
+        slidingWindowType: COUNT_BASED        record-exceptions:          - org.springframework.web.client.HttpServerErrorException          - java.io.IOException  retry:    instances:      outbound-service:        max-attempts: 3        wait-duration: 20        ignore-exceptions:          - org.springframework.web.client.HttpServerErrorException          - java.io.IOException        
 management:
   health:
     circuitbreakers:

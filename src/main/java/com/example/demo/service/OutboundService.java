@@ -28,13 +28,12 @@ public class OutboundService {
 
 	}
 
-	
 	@Retry(name = OUTBOUND_SERVICE, fallbackMethod = "outboundServiceFallback")
 	@CircuitBreaker(name = OUTBOUND_SERVICE)
 	public String callService(String url, String endpoint) {
 
 		System.out.println("attempting to call external service");
-		
+
 		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)//
 				.path(endpoint);
 
@@ -44,21 +43,20 @@ public class OutboundService {
 
 		ResponseEntity<String> response = null;
 
+		/* Try to perform the HTTP request call */
 		try {
-			/* Try to perform the HTTP request call */
 			response = restTemplate.exchange(requestEntity, String.class);
-		} catch (HttpClientErrorException | HttpServerErrorException ex) {
+		} catch (HttpClientErrorException | HttpServerErrorException exp) {
 			// @formatter:off
 			final String exception = String.format(
 					"ERROR: Call failed; with status code %d; Error `%s` on application URL `%s`; Status Code Text `%s`; Response Body `%s`",
-					ex.getStatusCode().value(), 
-					ex.getMessage(), 
+					exp.getStatusCode().value(), 
+					exp.getMessage(), 
 					serviceURI, 
-					ex.getStatusText(),
-					ex.getResponseBodyAsString());
+					exp.getStatusText(),
+					exp.getResponseBodyAsString());
 			// @formatter:on
 			System.out.println(exception);
-
 		}
 
 		/* return the body if the response was successful */
