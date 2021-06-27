@@ -6,7 +6,7 @@ resilience4j:
       outbound-service:        minimumNumberOfCalls: 10
         failureRateThreshold: 50        waitDurationInOpenState: 5s                automaticTransitionFromOpenToHalfOpenEnabled: true                permittedNumberOfCallsInHalfOpenState: 1                registerHealthIndicator: true
         slidingWindowSize: 5
-        slidingWindowType: COUNT_BASED        ignore-exceptions:          - org.springframework.web.client.HttpClientErrorException  retry:    instances:      outbound-service:        max-attempts: 3        wait-duration: 200        ignore-exceptions:          - org.springframework.web.client.HttpClientErrorException
+        slidingWindowType: COUNT_BASED        record-exceptions:            # only open the circuit in case targer service is producing 5XX or is down           - org.springframework.web.client.HttpServerErrorException           - org.springframework.web.client.ResourceAccessException#        ignore-exceptions:#          - org.springframework.web.client.HttpClientErrorException  retry:    instances:      outbound-service:        max-attempts: 3        wait-duration: 200        retry-exceptions:            # only open the circuit in case targer service is producing 5XX or is down           - org.springframework.web.client.HttpServerErrorException          - org.springframework.web.client.ResourceAccessException#        ignore-exceptions:#          - org.springframework.web.client.HttpClientErrorException
 management:
   health:
     circuitbreakers:
