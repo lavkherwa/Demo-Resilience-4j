@@ -64,6 +64,8 @@ public class OutboundService {
 
 	public String outboundServiceFallback(Exception exp) {
 
+		System.out.println("Exception occured: details: " + exp.getMessage());
+		
 		return "outbound service is down; details: " + exp.getMessage();
 	}
 
