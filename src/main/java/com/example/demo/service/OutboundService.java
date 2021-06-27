@@ -9,6 +9,7 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -64,7 +65,21 @@ public class OutboundService {
 
 	public String outboundServiceFallback(Exception exp) {
 
-		System.out.println("Exception occured: details: " + exp.getMessage());
+		if(exp instanceof HttpServerErrorException) {
+			// @formatter:off
+			final String exception = String.format(
+					"ERROR: Call failed; with status code %d; Error `%s` on application URL `%s`; Status Code Text `%s`; Response Body `%s`",
+					((HttpServerErrorException) exp).getStatusCode().value(), 
+					((HttpServerErrorException) exp).getMessage(), 
+					null, // serviceURI
+					((HttpServerErrorException) exp).getStatusText(),
+					((HttpServerErrorException) exp).getResponseBodyAsString());
+			// @formatter:on
+			System.out.println(exception);
+		}else {
+			System.out.println("Exception occured: details: " + exp.getMessage());	
+		}
+		
 		
 		return "outbound service is down; details: " + exp.getMessage();
 	}
