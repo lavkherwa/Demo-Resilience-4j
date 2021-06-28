@@ -58,14 +58,14 @@ public class OutboundService {
 			// @formatter:on
 			System.out.println(exception);
 		}
-		
+
 		/* return the body if the response was successful */
 		return response != null ? response.getBody() : null;
 	}
 
 	public String outboundServiceFallback(Exception exp) {
 
-		if(exp instanceof HttpServerErrorException) {
+		if (exp instanceof HttpServerErrorException) {
 			// @formatter:off
 			final String exception = String.format(
 					"ERROR: Call failed; with status code %d; Error `%s` on application URL `%s`; Status Code Text `%s`; Response Body `%s`",
@@ -75,12 +75,13 @@ public class OutboundService {
 					((HttpServerErrorException) exp).getStatusText(),
 					((HttpServerErrorException) exp).getResponseBodyAsString());
 			// @formatter:on
-			System.out.println(exception);
-		}else {
-			System.out.println("Exception occured: details: " + exp.getMessage());	
+			System.out.println("Exception occured: details: " + exception);
+			return "Server error; details: " + exception;
 		}
-		
-		
+
+		// for ResourceAccessException exception give SERVICE UNAVAILABLE - 503
+		System.out.println("Exception occured: details: " + exp.getMessage());
+
 		return "outbound service is down; details: " + exp.getMessage();
 	}
 
