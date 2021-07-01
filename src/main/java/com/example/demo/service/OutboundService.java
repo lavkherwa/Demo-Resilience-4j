@@ -14,7 +14,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.demo.data.HttpResonse;
+import com.example.demo.data.HttpResponse;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -31,18 +31,25 @@ public class OutboundService {
 
 	}
 
-	@Retry(name = OUTBOUND_SERVICE, fallbackMethod = "outboundServiceFallback")
 	@CircuitBreaker(name = OUTBOUND_SERVICE)
-	public HttpResonse callService(String url, String endpoint) {
+	@Retry(name = OUTBOUND_SERVICE, fallbackMethod = "outboundServiceFallback")
+	public HttpResponse callService(String url, String endpoint) {
 
 		System.out.println("attempting to call external service");
 
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)//
-				.path(endpoint);
+		// @formatter:off
+		final URI serviceURI = UriComponentsBuilder
+										.fromHttpUrl(url)
+										.path(endpoint)
+										.build(true)
+										.toUri();
 
-		final URI serviceURI = uriBuilder.build(true).toUri();
-
-		RequestEntity<Void> requestEntity = RequestEntity.get(serviceURI).headers(initHeaders()).build();
+		
+		RequestEntity<Void> requestEntity = RequestEntity
+												.get(serviceURI)
+												.headers(initHeaders())
+												.build();
+		// @formatter:on
 
 		ResponseEntity<String> response = null;
 
@@ -61,7 +68,7 @@ public class OutboundService {
 
 			System.out.println(exception);
 			
-			return HttpResonse
+			return HttpResponse
 						.builder()
 						.status(exp.getStatusCode())
 						.message(exp.getMessage())
@@ -70,12 +77,18 @@ public class OutboundService {
 		}
 
 		/* return the body if the response was successful */
-		return response != null
-				? HttpResonse.builder().status(response.getStatusCode()).message(null).body(response.getBody()).build()
+		// @formatter:off
+ 		return response != null
+				? HttpResponse
+						.builder()
+						.status(response.getStatusCode())
+						.body(response.getBody())
+						.build()
 				: null;
+ 		// @formatter:on
 	}
 
-	public HttpResonse outboundServiceFallback(Exception exp) {
+	public HttpResponse outboundServiceFallback(Exception exp) {
 
 		if (exp instanceof HttpServerErrorException) {
 			// @formatter:off
@@ -88,7 +101,7 @@ public class OutboundService {
 					((HttpServerErrorException) exp).getResponseBodyAsString());
 	
 			System.out.println("Exception occured: details: " + exception);
-			return HttpResonse
+			return HttpResponse
 					.builder()
 					.status(((HttpServerErrorException) exp).getStatusCode())
 					.message(((HttpServerErrorException) exp).getMessage())
@@ -100,7 +113,7 @@ public class OutboundService {
 		System.out.println("Exception occured: details: " + exp.getMessage());
 
 		// @formatter:off
-		return HttpResonse
+		return HttpResponse
 				.builder()
 				.status(HttpStatus.SERVICE_UNAVAILABLE)
 				.message(exp.getMessage())

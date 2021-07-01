@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class HttpResonse {
+public class HttpResponse {
 
 	private HttpStatus status;
 	private String message;
